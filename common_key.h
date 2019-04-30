@@ -3,24 +3,30 @@
 
 #include <cstdint>
 #include <fstream>
+#include <vector>
 
 class Key {
-	
-	uint8_t public_key, private_key;
+
+	uint8_t exponent;
 	uint16_t mod;
-	std::ifstream file;
 
 	public:
-	
+	Key(uint8_t exponent, uint16_t mod);
+
 	Key(const char *file_name);
 
-	uint8_t get_public_key();
+	Key();
 
-	uint8_t get_private_key();
-
+	uint8_t get_exponent();
+	
 	uint16_t get_modulus();
 
-	~Key();
+};
+
+
+class KeyFactory {
+	public:
+	static std::vector<Key*> Create(const char *file_name);
 };
 
 #endif

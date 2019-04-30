@@ -2,16 +2,18 @@
 #include <cstdint>
 
 #include "common_encrypter.h"
+#include "common_key.h"
 
-							//CERT 				PRI 				PUBLIC
-Encrypter::Encrypter(std::string &cert, uint8_t &s_exp, uint8_t &cli_exp) {
+
+Encrypter::Encrypter(std::string &cert, Key &private_key, Key &public_key) {
 	this->certificate = cert;
-	this->server_exponent = s_exp;
-	this->client_exponent = cli_exp;
-	this->modulus = 253;
+	this->public_exponent = public_key.get_exponent();
+	this->private_exponent = private_key.get_exponent();
+	this->public_modulus = public_key.get_modulus();
+	this->private_modulus = private_key.get_modulus();
 	this->hash_calculated = 0;
-	std::cout << "Clave Privada: (" << (int) this->server_exponent << ", " << this->modulus << ")" << std::endl;
-	std::cout << "Clave Publica: (" << (int) this->client_exponent << ", " << this->modulus << ")" << std::endl;
+	std::cout << "Clave Privada: (" << (int) this->private_exponent << ", " << this->private_modulus << ")" << std::endl;
+	std::cout << "Clave Publica: (" << (int) this->public_exponent << ", " << this->public_modulus << ")" << std::endl;
 }
 
 void Encrypter::calculate_hash() {
@@ -45,11 +47,11 @@ uint32_t Encrypter::rsa(uint32_t num, uint8_t exponent, uint16_t mod) {
 
 
 uint32_t Encrypter::encrypt_with_private_key() {
-	return this->rsa(this->hash_calculated, this->server_exponent, this->modulus);
+	return this->rsa(this->hash_calculated, this->private_exponent, this->private_modulus);
 }
 
 uint32_t Encrypter::encrypt_with_public_key(uint32_t &tmp_huella) {
-	return this->rsa(tmp_huella, this->client_exponent, this->modulus);
+	return this->rsa(tmp_huella, this->public_exponent, this->public_modulus);
 }
 
 uint32_t Encrypter::encrypt() {
@@ -58,6 +60,6 @@ uint32_t Encrypter::encrypt() {
 }
 
 uint32_t Encrypter::decrypt(uint32_t print) {
-	uint32_t huella = this->rsa(print, this->server_exponent, this->modulus);
+	uint32_t huella = this->rsa(print, this->private_exponent, this->private_modulus);
 	return this->encrypt_with_public_key(huella);
 }

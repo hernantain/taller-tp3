@@ -5,10 +5,12 @@
 #include <sstream>
 #include <cstdint>
 
+#include "common_key.h"
+
 class Encrypter {
 
-	uint8_t server_exponent, client_exponent;
-	uint16_t modulus;
+	uint8_t private_exponent, public_exponent;
+	uint16_t private_modulus, public_modulus;
 	uint32_t hash_calculated;
 	std::string certificate;
 
@@ -19,7 +21,8 @@ class Encrypter {
 	uint32_t encrypt_with_public_key(uint32_t &tmp_huella);
 
 	public:
-	Encrypter(std::string &cert, uint8_t &s_exp, uint8_t &cli_exp);
+		//CERT  PRI  PUBLIC
+	Encrypter(std::string &cert, Key &private_key, Key &public_key);
 
 	void calculate_hash();
 

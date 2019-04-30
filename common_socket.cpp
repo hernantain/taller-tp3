@@ -140,7 +140,7 @@ void Socket::operator>>(std::string &s) {
 	uint32_t len;
 	this->receive((char*) &len, FOUR_BYTE_LEN);
 	len = ntohl(len);
-	char *tmp = (char*) calloc( len, sizeof(char));
+	char *tmp = (char*) calloc( (len+1), sizeof(char));
 	this->receive(tmp, len);
 	s = tmp;
 	free(tmp);

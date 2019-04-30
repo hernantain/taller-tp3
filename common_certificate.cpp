@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <fstream>
 
 #include "common_certificate.h"
 
@@ -59,6 +60,17 @@ std::string Certificate::get_exponent_with_format() {
 	return exp;
 }
 
+std::string Certificate::get_file_name() {
+	return this->subject += ".cert";
+}
+
+void Certificate::save() {
+	std::string file_name = this->get_file_name();
+	std::ofstream output(file_name);
+	output << this->operator()();
+	output.close();
+}
+
 
 std::string Certificate::operator()() {
 	std::string certificate = "certificate:\n"; 	
@@ -68,7 +80,7 @@ std::string Certificate::operator()() {
 	certificate.append(subject);
 	std::string issuer = this->get_issuer_with_format();
 	certificate.append(issuer);
-	certificate.append("\tvalidity:\n"); //VALIDITY
+	certificate.append("\tvalidity:\n"); 
 	std::string start_date = this->get_start_date_with_format();
 	certificate.append(start_date);
 	std::string end_date = this->get_end_date_with_format();
