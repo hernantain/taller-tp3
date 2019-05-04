@@ -44,7 +44,7 @@ void ActiveUsers::save() {
 	std::unordered_map<std::string, Key>:: iterator itr; 
 	this->f2.open("index.txt");
 	this->f2 << std::to_string(this->current_index) << std::endl;
-	std::cout << "INDEX: " << this->current_index << std::endl;
+	//std::cout << "INDEX: " << this->current_index << std::endl;
 	for (itr = this->private_map.begin(); itr != this->private_map.end(); itr++) { 
 		//std::cout << itr->first << "; " << (int) itr->second.get_exponent() << " " << itr->second.get_modulus() << std::endl;
 		this->f2 << itr->first << "; " << std::to_string(itr->second.get_exponent()) << " " << std::to_string(itr->second.get_modulus()) << std::endl;

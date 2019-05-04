@@ -54,8 +54,7 @@ int main(int argc, char* argv[]) {
 		skt << (uint8_t) NEW_COMMAND;
 		
 		ClientInfo client_info(req_info);
-		skt << client_info.get_name();;
-		
+		skt << client_info.get_name();
 		skt << public_client_key.get_modulus();
 		skt << public_client_key.get_exponent();
 		skt << client_info.get_start_date();
@@ -67,12 +66,10 @@ int main(int argc, char* argv[]) {
 			std::cout << "Error: ya existe un certificado." << std::endl;
 			return 1;
 		} else {
-			std::cout << "USUARIO NO REGISTRADO" << std::endl;
 			Certificate certificate;
 			skt >> certificate.serial_number;
 			skt >> certificate.subject;
-			//skt >> certificate.issuer;
-			//std::cout << "Recibimos el issuer" << certificate.issuer << std::endl;
+			skt >> certificate.issuer;
 			skt >> certificate.start_date;
 			skt >> certificate.end_date;
 			skt >> certificate.client_modulus;
@@ -109,12 +106,12 @@ int main(int argc, char* argv[]) {
 	} else if (mode == REV_MODE) {
 		skt << (uint8_t) REV_COMMAND;
 		const char *certificate_file = argv[INFO_CERT];
-		Certificate certificate(certificate_file);
 
+
+		Certificate certificate(certificate_file);
 		skt << certificate.serial_number;
 		skt << certificate.subject;
-		/////std::cout << "Por mandar el issuer: " << new_cert.issuer << std::endl;
-		/////skt << certificate.issuer;
+		skt << certificate.issuer;
 		skt << certificate.start_date;
 		skt << certificate.end_date;
 		skt << certificate.client_modulus;

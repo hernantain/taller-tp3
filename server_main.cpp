@@ -69,25 +69,25 @@ int main(int argc, char* argv[]) {
 			Encrypter encrypter(cert_string, private_server_key, client_public_key);
 			encrypter.calculate_hash();
 			std::cout << "Hash calculado: " << encrypter.get_calculated_hash() << std::endl;
-			//std::cout << encrypter.encrypt() << std::endl;
 			std::cout << cert_string; 
 
 			connected_skt << new_cert.serial_number;
 			connected_skt << new_cert.subject;
-			/////std::cout << "Por mandar el issuer: " << new_cert.issuer << std::endl;
-			/////connected_skt << new_cert.issuer;
+			connected_skt << new_cert.issuer;
 			connected_skt << new_cert.start_date;
 			connected_skt << new_cert.end_date;
 			connected_skt << new_cert.client_modulus;
 			connected_skt << new_cert.client_exponent;
+			
 			uint32_t calculated_print = encrypter.encrypt();
 			connected_skt << calculated_print;
-			std::cout << "Huella calculada: " << calculated_print << std::endl;
+			
+			//std::cout << "Huella calculada: " << calculated_print << std::endl;
+			
 			uint8_t hashing_status;
 			connected_skt >> hashing_status;
-			
 			if (hashing_status == 1) {
-				std::cout << "Error" << std::endl;
+				std::cout << "Error, los hashes no coincidieron" << std::endl;
 				return 1;
 			}
 
@@ -95,17 +95,15 @@ int main(int argc, char* argv[]) {
 		}
 	} else if (command == REV_COMMAND){
 		std::cout << "Es un revoke..." << std::endl;
-
 		Certificate certificate;
 		connected_skt >> certificate.serial_number;
 		connected_skt >> certificate.subject;
-		//connected_skt >> certificate.issuer;
-		//std::cout << "Recibimos el issuer" << certificate.issuer << std::endl;
+		connected_skt >> certificate.issuer;
 		connected_skt >> certificate.start_date;
 		connected_skt >> certificate.end_date;
 		connected_skt >> certificate.client_modulus;
 		connected_skt >> certificate.client_exponent;
-	
+
 		uint32_t encrypted_hash;
 		connected_skt >> encrypted_hash;
 
