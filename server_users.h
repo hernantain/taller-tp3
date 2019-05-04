@@ -10,7 +10,7 @@
 class ActiveUsers {
 
 	int current_index;
-	std::fstream file;
+	std::ifstream file;
 	std::ofstream f2;
 	std::unordered_map<std::string, Key> private_map;
 
@@ -22,6 +22,10 @@ class ActiveUsers {
 	void add(std::string user, Key &key);
 
 	int get_next_index();
+
+	Key get_key(std::string user);
+
+	void remove(std::string user);
 
 	void save();
 };

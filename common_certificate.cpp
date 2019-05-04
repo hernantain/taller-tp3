@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <sstream>
 
 #include "common_certificate.h"
 
@@ -8,7 +9,7 @@ std::string Certificate::get_serial_number_with_format() {
 	std::string serial_num = std::to_string(this->serial_number);
 	char hex_serial_num[15];
 	snprintf(hex_serial_num, 15, " (0x%08x)\n", this->serial_number);
-	serial_num.insert(0, "\tserial numer: ");
+	serial_num.insert(0, "\tserial number: ");
 	serial_num.append(hex_serial_num);
 	return serial_num;
 }
@@ -61,7 +62,8 @@ std::string Certificate::get_exponent_with_format() {
 }
 
 std::string Certificate::get_file_name() {
-	return this->subject += ".cert";
+	std::string file_name = this->subject;
+	return file_name += ".cert";
 }
 
 void Certificate::save() {
@@ -93,4 +95,49 @@ std::string Certificate::operator()() {
 	return certificate;
 }
 
+Certificate::Certificate(){}
 
+
+uint32_t Certificate::get_number(std::string &num) {
+	std::string number;
+	std::istringstream string_num(num);
+	string_num >> number;
+	return std::stoi(number);
+}
+
+
+Certificate::Certificate(const char *file_name) {
+	std::ifstream file(file_name);
+	std::string key_side, value_side;
+	std::getline(file, key_side);
+	std::getline(file, key_side, ':');
+	std::getline(file, value_side);
+	this->serial_number = this->get_number(value_side);
+	std::getline(file, key_side, ':');
+	std::getline(file.ignore( 1, ' '), value_side);
+	this->subject = value_side;
+	std::getline(file, key_side); //ISSUER
+	std::getline(file, key_side); //VALIDITY
+
+	std::getline(file, key_side, ':');
+	std::getline(file.ignore( 1, ' '), value_side);
+	this->start_date = value_side;
+
+	std::getline(file, key_side, ':');
+	std::getline(file.ignore( 1, ' '), value_side);
+	this->end_date = value_side;
+
+	std::getline(file, key_side);
+
+	std::getline(file, key_side, ':');
+	std::getline(file, value_side);
+	this->client_exponent = (uint8_t) this->get_number(value_side);
+
+	std::getline(file, key_side, ':');
+	std::getline(file, value_side);
+	this->client_modulus = (uint16_t) this->get_number(value_side);
+
+
+
+
+}

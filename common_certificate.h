@@ -14,6 +14,8 @@ class Certificate {
 	std::string get_exponent_with_format();
 	std::string get_file_name();
 
+	uint32_t get_number(std::string &num);
+
 	public:
 	std::string issuer = "Taller de programacion 1";
 	uint8_t client_exponent;
@@ -24,6 +26,10 @@ class Certificate {
 	void save();
 
 	std::string operator()();
+
+	Certificate();
+
+	Certificate(const char *file_name);
 
 
 };

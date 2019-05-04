@@ -17,6 +17,7 @@
 #include "common_encrypter.h"
 
 #define NEW_COMMAND 0
+#define REV_COMMAND 1
 #define HOST_ARG 1
 #define PORT_ARG 2
 #define CLIENT_KEYS 4
@@ -40,17 +41,21 @@ int main(int argc, char* argv[]) {
 	const char *client_keys = argv[CLIENT_KEYS];
 	const char *pub_serv_keys = argv[PUB_SERV_KEYS];
 
+	Socket skt(host, port);
+	
+	std::vector<Key*> keys = KeyFactory::Create(client_keys);
+	Key public_client_key = *keys[0];
+	Key private_client_key = *keys[1];
+			
+	Key server_pub_keys(pub_serv_keys);
+	
 	if (mode == NEW_MODE) {
 		const char *req_info = argv[INFO_CERT];
-		Socket skt(host, port);
 		skt << (uint8_t) NEW_COMMAND;
 		
 		ClientInfo client_info(req_info);
 		skt << client_info.get_name();;
-		std::vector<Key*> keys = KeyFactory::Create(client_keys);
 		
-		Key public_client_key = *keys[0];
-		Key private_client_key = *keys[1];
 		skt << public_client_key.get_modulus();
 		skt << public_client_key.get_exponent();
 		skt << client_info.get_start_date();
@@ -75,7 +80,6 @@ int main(int argc, char* argv[]) {
 
 			std::cout << certificate();
 			std::string cert_string = certificate();
-			Key server_pub_keys(pub_serv_keys);
 			Encrypter encrypter(cert_string, private_client_key, server_pub_keys);
 
 			uint32_t server_print;
@@ -103,6 +107,38 @@ int main(int argc, char* argv[]) {
 		}
 
 	} else if (mode == REV_MODE) {
+		skt << (uint8_t) REV_COMMAND;
+		const char *certificate_file = argv[INFO_CERT];
+		Certificate certificate(certificate_file);
+
+		skt << certificate.serial_number;
+		skt << certificate.subject;
+		/////std::cout << "Por mandar el issuer: " << new_cert.issuer << std::endl;
+		/////skt << certificate.issuer;
+		skt << certificate.start_date;
+		skt << certificate.end_date;
+		skt << certificate.client_modulus;
+		skt << certificate.client_exponent;
+
+		std::string cert = certificate();
+
+		Encrypter encrypter(cert, private_client_key, server_pub_keys);
+		encrypter.calculate_hash();
+		uint32_t encrypted_hash = encrypter.encrypt();
+
+		skt << encrypted_hash;
+
+		uint8_t revoke_status;
+		skt >> revoke_status;
+		if (revoke_status == 0) {
+			std::cout << "TODO PIOLA" << std:: endl;
+		} else if (revoke_status == 1) {
+			std::cout << "Error: usuario no registrado." << std::endl;
+			return 1;
+		} else if (revoke_status == 2) {
+			std::cout << "Error: los hashes no coiniciden." << std::endl;
+			return 1;
+		}
 
 	} else {
 		printf("Error: argumentos invalidos.\n"); 
