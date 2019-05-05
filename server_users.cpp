@@ -6,7 +6,7 @@
 #include "server_users.h"
 #include "common_key.h"
 
-ActiveUsers::ActiveUsers(const char *file_name) {
+ActiveUsers::ActiveUsers(std::string &file_name) {
 	this->file.open(file_name);
 	uint16_t n1, n2;
 	std::string index, line, subject;

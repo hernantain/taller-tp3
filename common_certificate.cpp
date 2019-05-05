@@ -106,7 +106,7 @@ uint32_t Certificate::get_number(std::string &num) {
 }
 
 
-Certificate::Certificate(const char *file_name) {
+Certificate::Certificate(std::string &file_name) {
 	std::ifstream file(file_name);
 	std::string key_side, value_side;
 	std::getline(file, key_side);
@@ -136,8 +136,4 @@ Certificate::Certificate(const char *file_name) {
 	std::getline(file, key_side, ':');
 	std::getline(file, value_side);
 	this->client_modulus = (uint16_t) this->get_number(value_side);
-
-
-
-
 }

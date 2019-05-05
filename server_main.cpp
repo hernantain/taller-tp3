@@ -13,6 +13,8 @@
 #include "server_users.h"
 #include "common_encrypter.h"
 
+#include "server_mode.h"
+
 #define REGISTERED_CERTIFICATE 0
 #define NEW_COMMAND 0
 #define REV_COMMAND 1
@@ -31,9 +33,7 @@ int main(int argc, char* argv[]) {
 
 	const char *port = argv[PORT_ARG];
 	const char *server_keys = argv[SERVER_KEYS];
-	const char *index = argv[INDEX_ARG];
-
-	ActiveUsers active_users(index);
+	std::string index = argv[INDEX_ARG];
 
 	Socket acep_skt(NULL, port);
 	Socket connected_skt = acep_skt.accep();
@@ -48,87 +48,20 @@ int main(int argc, char* argv[]) {
 	if (command == NEW_COMMAND) {
 		printf("Hay que hacer un new...\n");
 		
-		Certificate new_cert;
-		connected_skt >> new_cert.subject;
-		connected_skt >> new_cert.client_modulus;
-		connected_skt >> new_cert.client_exponent;
-		connected_skt >> new_cert.start_date;
-		connected_skt >> new_cert.end_date;
-		Key client_public_key(new_cert.client_exponent, new_cert.client_modulus);
+		ServerNewMode mode(connected_skt, private_server_key, index);
+		
+		mode.receive();
 
-		if (active_users.has(new_cert.subject)) {
-			connected_skt << (uint8_t) REGISTERED_CERTIFICATE;
-		} else { 
-			connected_skt << (uint8_t) NOT_REGISTERED_CERTIFICATE;
+		mode.send();
 
-			new_cert.serial_number = (uint32_t) active_users.get_next_index();
-			active_users.add(new_cert.subject, client_public_key);
-			
-			
-			std::string cert_string = new_cert();
-			Encrypter encrypter(cert_string, private_server_key, client_public_key);
-			encrypter.calculate_hash();
-			std::cout << "Hash calculado: " << encrypter.get_calculated_hash() << std::endl;
-			std::cout << cert_string; 
-
-			connected_skt << new_cert.serial_number;
-			connected_skt << new_cert.subject;
-			connected_skt << new_cert.issuer;
-			connected_skt << new_cert.start_date;
-			connected_skt << new_cert.end_date;
-			connected_skt << new_cert.client_modulus;
-			connected_skt << new_cert.client_exponent;
-			
-			uint32_t calculated_print = encrypter.encrypt();
-			connected_skt << calculated_print;
-			
-			//std::cout << "Huella calculada: " << calculated_print << std::endl;
-			
-			uint8_t hashing_status;
-			connected_skt >> hashing_status;
-			if (hashing_status == 1) {
-				std::cout << "Error, los hashes no coincidieron" << std::endl;
-				return 1;
-			}
-
-			active_users.save();
-		}
-	} else if (command == REV_COMMAND){
+	} else if (command == REV_COMMAND) {
+		
 		std::cout << "Es un revoke..." << std::endl;
-		Certificate certificate;
-		connected_skt >> certificate.serial_number;
-		connected_skt >> certificate.subject;
-		connected_skt >> certificate.issuer;
-		connected_skt >> certificate.start_date;
-		connected_skt >> certificate.end_date;
-		connected_skt >> certificate.client_modulus;
-		connected_skt >> certificate.client_exponent;
-
-		uint32_t encrypted_hash;
-		connected_skt >> encrypted_hash;
-
-		if (active_users.has(certificate.subject)) {
-			std::cout << certificate.subject << " esta en los registros" << std::endl;
 			
-			Key client_pub_key = active_users.get_key(certificate.subject);
-			std::string stringCert = certificate();
+		ServerRevokeMode mode(connected_skt, private_server_key, index);
 
-			Encrypter encrypter(stringCert, private_server_key, client_pub_key);
-			uint32_t decrypted_hash = encrypter.decrypt(encrypted_hash);
-
-			encrypter.calculate_hash();
-			uint32_t calculated_hash = encrypter.get_calculated_hash();
-
-			uint8_t hash_status = (calculated_hash == decrypted_hash) ? 0 : 2;
-			if (hash_status == 0) {
-				active_users.remove(certificate.subject);
-				std::cout << "Eliminando del map a: " << certificate.subject << std::endl;
-				active_users.save();
-			}
-			connected_skt << hash_status;
-		} else {
-			connected_skt << (uint8_t) NOT_REGISTERED_CERTIFICATE;
-		}
+		mode.receive();
 	}
+	
 	return 0;
 }

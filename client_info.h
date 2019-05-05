@@ -11,7 +11,7 @@ class ClientInfo {
 	std::ifstream file;
 
 	public:
-	ClientInfo(const char *file_name);
+	ClientInfo(std::string file_name);
 
 	std::string get_name();
 

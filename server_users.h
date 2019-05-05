@@ -15,7 +15,7 @@ class ActiveUsers {
 	std::unordered_map<std::string, Key> private_map;
 
 	public:
-	ActiveUsers(const char *file_name);
+	ActiveUsers(std::string &file_name);
 
 	bool has(std::string key);
 

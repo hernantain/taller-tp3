@@ -5,7 +5,7 @@
 
 #define THIRTY_DAYS 2592000 // 24 * 60 * 60 * 30
 
-ClientInfo::ClientInfo(const char *file_name) {
+ClientInfo::ClientInfo(std::string file_name) {
 	this->file.open(file_name);
 	std::getline(this->file, this->name);
 

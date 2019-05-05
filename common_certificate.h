@@ -29,7 +29,7 @@ class Certificate {
 
 	Certificate();
 
-	Certificate(const char *file_name);
+	Certificate(std::string &file_name);
 
 
 };
