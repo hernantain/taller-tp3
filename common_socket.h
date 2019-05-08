@@ -5,11 +5,13 @@
 class Socket {
 	int fd; 
 
-	Socket(int fd);
+	Socket(int fd, bool valid);
 
 	public:
 
-	Socket(const char *hostname, const char *port);
+	bool is_valid;
+
+	Socket(const char *hostname, const char *port, bool server);
 
 	Socket accep();
 

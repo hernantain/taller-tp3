@@ -26,6 +26,7 @@ ClientNewMode::ClientNewMode(Socket &skt,
 
 
 void ClientNewMode::send() {
+	std::cout << "Por mandar: " << this->client_info.get_name() << std::endl;
 	this->skt << this->client_info.get_name();
 	this->skt << this->public_client_key.get_modulus();
 	this->skt << this->public_client_key.get_exponent();

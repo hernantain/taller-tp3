@@ -6,23 +6,22 @@
 #include <sstream>
 #include <iomanip>
 #include <vector>
+#include <thread>
 
 #include "common_socket.h"
 #include "common_key.h"
 #include "common_certificate.h"
-#include "server_users.h"
 #include "common_encrypter.h"
-
-#include "server_mode.h"
+#include "server_thread.h"
+#include "server_index.h"
 
 #define REGISTERED_CERTIFICATE 0
-#define NEW_COMMAND 0
-#define REV_COMMAND 1
 #define NOT_REGISTERED_CERTIFICATE 1
 #define PORT_ARG 1
 #define SERVER_KEYS 2
 #define INDEX_ARG 3
 #define EXACT_ARGS 4
+
 
 int main(int argc, char* argv[]) {
 
@@ -35,33 +34,19 @@ int main(int argc, char* argv[]) {
 	const char *server_keys = argv[SERVER_KEYS];
 	std::string index = argv[INDEX_ARG];
 
-	Socket acep_skt(NULL, port);
-	Socket connected_skt = acep_skt.accep();
+	Thread *acceptor = new AcceptorThread(port, server_keys, index);
 
-	uint8_t command;
-	connected_skt >> command;
+	acceptor->start();
 
-	std::vector<Key*> keys = KeyFactory::Create(server_keys);
-	//Key public_server_key = *keys[0];
-	Key private_server_key = *keys[1];
+	char c;
+	do {
+		c = getchar();
+		std::cout << c;
+	} while (c != 'q');
 
-	if (command == NEW_COMMAND) {
-		printf("Hay que hacer un new...\n");
-		
-		ServerNewMode mode(connected_skt, private_server_key, index);
-		
-		mode.receive();
+	acceptor->stop();
+	acceptor->join();
+	delete acceptor;
 
-		mode.send();
-
-	} else if (command == REV_COMMAND) {
-		
-		std::cout << "Es un revoke..." << std::endl;
-			
-		ServerRevokeMode mode(connected_skt, private_server_key, index);
-
-		mode.receive();
-	}
-	
 	return 0;
 }

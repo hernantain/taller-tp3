@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
 	const char *client_keys = argv[CLIENT_KEYS];
 	const char *pub_serv_keys = argv[PUB_SERV_KEYS];
 
-	Socket skt(host, port);
+	Socket skt(host, port, false);
 	
 	std::vector<Key*> keys = KeyFactory::Create(client_keys);
 	Key public_client_key = *keys[0];

@@ -18,7 +18,7 @@
 #define FOUR_BYTE_LEN 4
 #define MAX_LSTN_CON 10
 
-Socket::Socket(const char *hostname, const char *port) {
+Socket::Socket(const char *hostname, const char *port, bool server) {
 	struct addrinfo hints, *results, *rp;
 
 	memset(&hints, 0, sizeof(struct addrinfo));
@@ -34,7 +34,11 @@ Socket::Socket(const char *hostname, const char *port) {
 	}
 
 	for (rp = results; rp != NULL; rp = rp->ai_next) {
-		this->fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+		if (server)
+			this->fd = socket(rp->ai_family, rp->ai_socktype | SOCK_NONBLOCK, rp->ai_protocol);
+		else 
+			this->fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+
 		if (this->fd == -1) {
 			printf("Error: %s\n", strerror(errno));
 			continue;
@@ -64,13 +68,29 @@ Socket::Socket(const char *hostname, const char *port) {
 	freeaddrinfo(results);
 }
 
-Socket::Socket(int fd) {
+Socket::Socket(int fd, bool valid) {
 	this->fd = fd;
+	this->is_valid = valid;
 }
 
 Socket Socket::accep() {
-	int fd = accept(this->fd, NULL, NULL);
-	return std::move(Socket(fd));
+	int fd;
+	/*while (true) {
+		fd = accept(this->fd, NULL, NULL);
+		if ((fd == -1) && ((errno == EWOULDBLOCK) || (errno == EAGAIN))) {
+			std::cout << "FALLA. PASA POR ACA" << std::endl;
+			sleep(1);
+			continue;
+		}
+		return std::move(Socket(fd));
+	}*/
+	fd = accept(this->fd, NULL, NULL);
+	if ((fd == -1) && ((errno == EWOULDBLOCK) || (errno == EAGAIN))) {
+		std::cout << "WAITING..." << std::endl;
+		return std::move(Socket(fd, false));
+	}
+
+	return std::move(Socket(fd, true));
 }
 
 void Socket::receive(char *buf, int size) {

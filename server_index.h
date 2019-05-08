@@ -7,15 +7,16 @@
 
 #include "common_key.h"
 
-class ActiveUsers {
+class IndexHandler {
 
 	int current_index;
-	std::ifstream file;
-	std::ofstream f2;
+	std::string file_name;
+	std::ifstream read_file;
+	std::ofstream write_file;
 	std::unordered_map<std::string, Key> private_map;
 
 	public:
-	ActiveUsers(std::string &file_name);
+	IndexHandler(std::string &file_name);
 
 	bool has(std::string key);
 
@@ -29,6 +30,5 @@ class ActiveUsers {
 
 	void save();
 };
-
 
 #endif

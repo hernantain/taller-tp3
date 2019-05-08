@@ -6,18 +6,17 @@
 #include "common_certificate.h"
 #include "common_key.h"
 #include "common_socket.h"
-#include "server_users.h"
+#include "server_index.h"
 
 
 class ServerMode {
-	
 	protected:
 	Certificate new_cert;
 	Socket skt;
 	Key private_server_key;
-	ActiveUsers active_users;
+	IndexHandler &index_handler;
 
-	ServerMode(Socket &skt, Key &private_server_key, std::string &index);
+	ServerMode(Socket &skt, Key &private_server_key, IndexHandler &index_handler);
 
 	virtual void receive() = 0;
 
@@ -27,25 +26,21 @@ class ServerMode {
 
 
 class ServerNewMode: public ServerMode {
-
 	Key client_public_key;
 
 	public:
 
-	ServerNewMode(Socket &skt, Key &private_server_key, std::string &index);
+	ServerNewMode(Socket &skt, Key &private_server_key, IndexHandler &index_handler);
 
 	virtual void receive();
-
 };
 
 class ServerRevokeMode: public ServerMode {
-
 	public:
 
-	ServerRevokeMode(Socket &skt, Key &private_server_key, std::string &index);
+	ServerRevokeMode(Socket &skt, Key &private_server_key, IndexHandler &index_handler);
 
 	virtual void receive();
-
 };
 
 

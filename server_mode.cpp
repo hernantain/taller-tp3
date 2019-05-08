@@ -14,14 +14,14 @@
 
 ServerMode::ServerMode(Socket &skt, 
 					Key &private_server_key, 
-					std::string &index) : skt(skt),
+					IndexHandler &index_handler) : skt(skt),
 										private_server_key(private_server_key),
-										active_users(index) {}
+										index_handler(index_handler) {}
 
 
 ServerNewMode::ServerNewMode(Socket &skt, 
 					Key &private_server_key, 
-					std::string &index) : ServerMode(skt, private_server_key, index) {}
+					IndexHandler &index_handler) : ServerMode(skt, private_server_key, index_handler) {}
 
 
 
@@ -36,13 +36,13 @@ void ServerNewMode::receive() {
 void ServerMode::send() {
 	Key client_public_key(this->new_cert.client_exponent, this->new_cert.client_modulus);
 
-	if (this->active_users.has(this->new_cert.subject)) {
+	if (this->index_handler.has(this->new_cert.subject)) {
 		this->skt << (uint8_t) REGISTERED_CERTIFICATE;
 	} else { 
 		this->skt << (uint8_t) NOT_REGISTERED_CERTIFICATE;
 
-		this->new_cert.serial_number = (uint32_t) this->active_users.get_next_index();
-		this->active_users.add(this->new_cert.subject, client_public_key);
+		this->new_cert.serial_number = (uint32_t) this->index_handler.get_next_index();
+		this->index_handler.add(this->new_cert.subject, client_public_key);
 		
 		
 		std::string cert_string = this->new_cert();
@@ -68,17 +68,15 @@ void ServerMode::send() {
 			std::cout << "Error, los hashes no coincidieron" << std::endl;
 			exit(1);
 		}
-
-		this->active_users.save();
 	}
 }
 
 
 ServerRevokeMode::ServerRevokeMode(Socket &skt, 
 					Key &private_server_key, 
-					std::string &index) : ServerMode(skt, 
+					IndexHandler &index_handler) : ServerMode(skt, 
 									private_server_key, 
-									index) {}
+									index_handler) {}
 
 
 void ServerRevokeMode::receive() {
@@ -93,10 +91,10 @@ void ServerRevokeMode::receive() {
 	uint32_t encrypted_hash;
 	this->skt >> encrypted_hash;
 
-	if (this->active_users.has(this->new_cert.subject)) {
+	if (this->index_handler.has(this->new_cert.subject)) {
 		std::cout << this->new_cert.subject << " esta en los registros" << std::endl;
 		
-		Key client_pub_key = this->active_users.get_key(this->new_cert.subject);
+		Key client_pub_key = this->index_handler.get_key(this->new_cert.subject);
 		std::string stringCert = this->new_cert();
 
 		Encrypter encrypter(stringCert, this->private_server_key, client_pub_key);
@@ -107,9 +105,8 @@ void ServerRevokeMode::receive() {
 
 		uint8_t hash_status = (calculated_hash == decrypted_hash) ? 0 : 2;
 		if (hash_status == 0) {
-			this->active_users.remove(this->new_cert.subject);
+			this->index_handler.remove(this->new_cert.subject);
 			std::cout << "Eliminando del map a: " << this->new_cert.subject << std::endl;
-			this->active_users.save();
 		}
 		this->skt << hash_status;
 	} else {
