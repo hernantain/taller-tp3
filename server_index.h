@@ -2,7 +2,7 @@
 #define _SERVER_USERS
 
 #include <fstream>
-#include <unordered_map>
+#include <map>
 #include <iostream>
 
 #include "common_key.h"
@@ -13,7 +13,7 @@ class IndexHandler {
 	std::string file_name;
 	std::ifstream read_file;
 	std::ofstream write_file;
-	std::unordered_map<std::string, Key> private_map;
+	std::map<std::string, Key> private_map;
 
 	public:
 	IndexHandler(std::string &file_name);

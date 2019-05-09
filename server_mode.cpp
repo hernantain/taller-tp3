@@ -20,8 +20,11 @@ ServerMode::ServerMode(Socket &skt,
 
 
 ServerNewMode::ServerNewMode(Socket &skt, 
-					Key &private_server_key, 
-					IndexHandler &index_handler) : ServerMode(skt, private_server_key, index_handler) {}
+				Key &private_server_key, 
+				IndexHandler &index_handler) : 
+				ServerMode(skt, 
+						private_server_key,
+						index_handler) {}
 
 
 
@@ -48,8 +51,8 @@ void ServerMode::send() {
 		std::string cert_string = this->new_cert();
 		Encrypter encrypter(cert_string, this->private_server_key, client_public_key);
 		encrypter.calculate_hash();
-		std::cout << "Hash calculado: " << encrypter.get_calculated_hash() << std::endl;
-		std::cout << cert_string; 
+		//std::cout << "Hash calculado: " << encrypter.get_calculated_hash() << std::endl;
+		//std::cout << cert_string; 
 
 		this->skt << this->new_cert.serial_number;
 		this->skt << this->new_cert.subject;
@@ -65,8 +68,7 @@ void ServerMode::send() {
 		uint8_t hashing_status;
 		this->skt >> hashing_status;
 		if (hashing_status == 1) {
-			std::cout << "Error, los hashes no coincidieron" << std::endl;
-			exit(1);
+			this->index_handler.remove(this->new_cert.subject);
 		}
 	}
 }
@@ -92,7 +94,7 @@ void ServerRevokeMode::receive() {
 	this->skt >> encrypted_hash;
 
 	if (this->index_handler.has(this->new_cert.subject)) {
-		std::cout << this->new_cert.subject << " esta en los registros" << std::endl;
+		//std::cout << this->new_cert.subject << " esta en los registros" << std::endl;
 		
 		Key client_pub_key = this->index_handler.get_key(this->new_cert.subject);
 		std::string stringCert = this->new_cert();
@@ -106,7 +108,7 @@ void ServerRevokeMode::receive() {
 		uint8_t hash_status = (calculated_hash == decrypted_hash) ? 0 : 2;
 		if (hash_status == 0) {
 			this->index_handler.remove(this->new_cert.subject);
-			std::cout << "Eliminando del map a: " << this->new_cert.subject << std::endl;
+			//std::cout << "Eliminando del map a: " << this->new_cert.subject << std::endl;
 		}
 		this->skt << hash_status;
 	} else {

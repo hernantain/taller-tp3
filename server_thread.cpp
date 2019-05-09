@@ -43,14 +43,14 @@ void ClientThread::run() {
 	uint8_t command;
 	this->connected_skt >> command;
 
-	std::cout << (int) command << std::endl;
+	//std::cout << (int) command << std::endl;
 
 	std::vector<Key*> keys = KeyFactory::Create("server.keys");
 	//Key public_server_key = *keys[0];
 	Key private_server_key = *keys[1];
 
 	if (command == NEW_COMMAND) {
-		printf("Hay que hacer un new...\n");
+		//printf("Hay que hacer un new...\n");
 		
 		ServerNewMode mode(this->connected_skt, private_server_key, this->index_handler);
 		
@@ -60,7 +60,7 @@ void ClientThread::run() {
 
 	} else if (command == REV_COMMAND) {
 		
-		std::cout << "Es un revoke..." << std::endl;
+		//std::cout << "Es un revoke..." << std::endl;
 			
 		ServerRevokeMode mode(this->connected_skt, private_server_key, this->index_handler);
 
@@ -89,7 +89,7 @@ void AcceptorThread::run() {
 			break;
 		
 		if (connected_skt.is_valid) {
-			std::cout << "LLEGO UN CLIENTE" << std::endl;
+			//std::cout << "LLEGO UN CLIENTE" << std::endl;
 			Thread *ct = new ClientThread(connected_skt, index_handler);
 			ct->start();
 			this->clients.push_back(ct);

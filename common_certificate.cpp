@@ -55,8 +55,8 @@ std::string Certificate::get_modulus_with_format() {
 std::string Certificate::get_exponent_with_format() {
 	std::string exp = std::to_string(this->client_exponent);
 	exp.insert(0, "\t\texponent: ");
-	char hex_exp_num[9];
-	snprintf(hex_exp_num, 9, " (0x%02x)\n", this->client_exponent);
+	char hex_exp_num[8];
+	snprintf(hex_exp_num, 8, " (0x%02x)", this->client_exponent);
 	exp.append(hex_exp_num);
 	return exp;
 }

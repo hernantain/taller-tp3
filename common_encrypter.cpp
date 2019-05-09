@@ -12,8 +12,8 @@ Encrypter::Encrypter(std::string &cert, Key &private_key, Key &public_key) {
 	this->public_modulus = public_key.get_modulus();
 	this->private_modulus = private_key.get_modulus();
 	this->hash_calculated = 0;
-	std::cout << "Clave Privada: (" << (int) this->private_exponent << ", " << this->private_modulus << ")" << std::endl;
-	std::cout << "Clave Publica: (" << (int) this->public_exponent << ", " << this->public_modulus << ")" << std::endl;
+	//std::cout << "Clave Privada: (" << (int) this->private_exponent << ", " << this->private_modulus << ")" << std::endl;
+	//std::cout << "Clave Publica: (" << (int) this->public_exponent << ", " << this->public_modulus << ")" << std::endl;
 }
 
 void Encrypter::calculate_hash() {
@@ -26,6 +26,10 @@ void Encrypter::calculate_hash() {
 
 uint32_t Encrypter::get_calculated_hash() {
 	return this->hash_calculated;
+}
+
+uint32_t Encrypter::get_hash_encrypted_with_private() {
+	return this->hash_encrypted_private;
 }
 
 
@@ -55,8 +59,8 @@ uint32_t Encrypter::encrypt_with_public_key(uint32_t &tmp_huella) {
 }
 
 uint32_t Encrypter::encrypt() {
-	uint32_t huella = this->encrypt_with_private_key();
-	return this->encrypt_with_public_key(huella);
+	this->hash_encrypted_private = this->encrypt_with_private_key();
+	return this->encrypt_with_public_key(this->hash_encrypted_private);
 }
 
 uint32_t Encrypter::decrypt(uint32_t print) {

@@ -11,8 +11,9 @@ class Encrypter {
 
 	uint8_t private_exponent, public_exponent;
 	uint16_t private_modulus, public_modulus;
-	uint32_t hash_calculated;
+	uint32_t hash_calculated, hash_encrypted_private;
 	std::string certificate;
+
 
 	uint32_t rsa(uint32_t num, uint8_t exponent, uint16_t mod);
 
@@ -27,6 +28,8 @@ class Encrypter {
 	void calculate_hash();
 
 	uint32_t get_calculated_hash();
+
+	uint32_t get_hash_encrypted_with_private();
 
 	uint32_t encrypt();
 

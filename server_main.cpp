@@ -41,7 +41,6 @@ int main(int argc, char* argv[]) {
 	char c;
 	do {
 		c = getchar();
-		std::cout << c;
 	} while (c != 'q');
 
 	acceptor->stop();

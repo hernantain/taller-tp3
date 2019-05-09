@@ -75,21 +75,9 @@ Socket::Socket(int fd, bool valid) {
 
 Socket Socket::accep() {
 	int fd;
-	/*while (true) {
-		fd = accept(this->fd, NULL, NULL);
-		if ((fd == -1) && ((errno == EWOULDBLOCK) || (errno == EAGAIN))) {
-			std::cout << "FALLA. PASA POR ACA" << std::endl;
-			sleep(1);
-			continue;
-		}
-		return std::move(Socket(fd));
-	}*/
 	fd = accept(this->fd, NULL, NULL);
-	if ((fd == -1) && ((errno == EWOULDBLOCK) || (errno == EAGAIN))) {
-		std::cout << "WAITING..." << std::endl;
+	if ((fd == -1) && ((errno == EWOULDBLOCK) || (errno == EAGAIN)))
 		return std::move(Socket(fd, false));
-	}
-
 	return std::move(Socket(fd, true));
 }
 

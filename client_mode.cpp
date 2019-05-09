@@ -26,7 +26,6 @@ ClientNewMode::ClientNewMode(Socket &skt,
 
 
 void ClientNewMode::send() {
-	std::cout << "Por mandar: " << this->client_info.get_name() << std::endl;
 	this->skt << this->client_info.get_name();
 	this->skt << this->public_client_key.get_modulus();
 	this->skt << this->public_client_key.get_exponent();
@@ -39,7 +38,7 @@ void ClientMode::receive() {
 	skt >> status;
 	if (status == 0) {
 		std::cout << "Error: ya existe un certificado." << std::endl;
-		exit(1);
+		exit(0);
 	} else {
 		Certificate certificate;
 		skt >> certificate.serial_number;
@@ -50,7 +49,7 @@ void ClientMode::receive() {
 		skt >> certificate.client_modulus;
 		skt >> certificate.client_exponent;
 
-		std::cout << certificate();
+		//std::cout << certificate();
 		std::string cert_string = certificate();
 		Encrypter encrypter(cert_string, private_client_key, server_pub_keys);
 
@@ -69,12 +68,12 @@ void ClientMode::receive() {
 		uint8_t hash_status = (calculated_hash == server_hash) ? 0 : 1;
 		skt << hash_status;
 		if (hash_status == 0){
-			std::cout << "SON IGUALES!!!" << std::endl;
+			//std::cout << "SON IGUALES!!!" << std::endl;
 			certificate.save();
 			exit(0);
 		} else {
-			std::cout << "Error: los hashes no coiniciden." << std::endl;
-			exit(1);
+			std::cout << "Error: los hashes no coinciden." << std::endl;
+			exit(0);
 		}
 	}
 }
@@ -110,13 +109,15 @@ void ClientRevokeMode::send() {
 
 	uint8_t revoke_status;
 	this->skt >> revoke_status;
-	if (revoke_status == 0) {
-		std::cout << "TODO PIOLA" << std:: endl;
-	} else if (revoke_status == 1) {
+	
+	std::cout << "Hash calculado: " << encrypter.get_calculated_hash() << std::endl;
+	std::cout << "Hash encriptado con la clave privada: " << encrypter.get_hash_encrypted_with_private() << std::endl;
+	std::cout << "Huella enviada: " << encrypted_hash << std::endl;
+	if (revoke_status == 1) {
 		std::cout << "Error: usuario no registrado." << std::endl;
-		exit(1);
+		exit(0);
 	} else if (revoke_status == 2) {
-		std::cout << "Error: los hashes no coiniciden." << std::endl;
-		exit(1);
+		std::cout << "Error: los hashes no coinciden." << std::endl;
+		exit(0);
 	}
 }

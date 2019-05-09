@@ -20,9 +20,9 @@
 #define REV_COMMAND 1
 #define HOST_ARG 1
 #define PORT_ARG 2
-#define CLIENT_KEYS 4
-#define PUB_SERV_KEYS 5
-#define INFO_CERT 6
+#define CLIENT_KEYS 5
+#define PUB_SERV_KEYS 6
+#define INFO_CERT 4
 #define CLIENT_ARGS 7
 #define MODE_ARG 3
 #define NEW_MODE "new"

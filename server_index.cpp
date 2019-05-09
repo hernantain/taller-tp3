@@ -12,16 +12,19 @@ IndexHandler::IndexHandler(std::string &file_name) {
 	uint16_t n1, n2;
 	std::string index, line, subject;
 	std::getline(this->read_file, index);
-	this->current_index = std::stoi(index);
-	while(std::getline(this->read_file, line)) {
-		std::istringstream lineStream(line);
-		std::getline(lineStream, subject, ';');
-		lineStream >> n1 >> n2;
-		Key k((uint8_t) n1, n2);
-		this->private_map[subject] = k;
+	if (index.empty()) {
+		this->current_index = 1;
+	} else {
+		this->current_index = std::stoi(index);
+		while(std::getline(this->read_file, line)) {
+			std::istringstream lineStream(line);
+			std::getline(lineStream, subject, ';');
+			lineStream >> n1 >> n2;
+			Key k((uint8_t) n1, n2);
+			this->private_map[subject] = k;
+		}
 	}
 	this->read_file.close();
-
 }
 
 bool IndexHandler::has(std::string key) {
@@ -41,7 +44,7 @@ int IndexHandler::get_next_index() {
 }
 
 void IndexHandler::save() {
-	std::unordered_map<std::string, Key>:: iterator itr; 
+	std::map<std::string, Key>::iterator itr; 
 	this->write_file.open(this->file_name);
 	this->write_file << std::to_string(this->current_index) << std::endl;
 	for (itr = this->private_map.begin(); itr != this->private_map.end(); itr++) 
@@ -55,5 +58,4 @@ Key IndexHandler::get_key(std::string user) {
 
 void IndexHandler::remove(std::string user) {
 	this->private_map.erase(user);
-	this->current_index--;
 }
