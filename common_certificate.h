@@ -2,9 +2,9 @@
 #define _COMMON_CERTIFICATE
 
 #include <cstdint>
+#include <string>
 
 class Certificate {
-
 	std::string get_serial_number_with_format();
 	std::string get_subject_with_format();
 	std::string get_issuer_with_format(); 
@@ -29,9 +29,7 @@ class Certificate {
 
 	Certificate();
 
-	Certificate(std::string &file_name);
-
-
+	explicit Certificate(std::string &file_name);
 };
 
 

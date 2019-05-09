@@ -5,10 +5,14 @@
 
 #include "common_certificate.h"
 
+#define HEX_SIZE_SERIAL 15
+#define HEX_SIZE_EXPON 8
+#define HEX_SIZE_MOD 11
+
 std::string Certificate::get_serial_number_with_format() {
 	std::string serial_num = std::to_string(this->serial_number);
-	char hex_serial_num[15];
-	snprintf(hex_serial_num, 15, " (0x%08x)\n", this->serial_number);
+	char hex_serial_num[HEX_SIZE_SERIAL];
+	snprintf(hex_serial_num, HEX_SIZE_SERIAL, " (0x%08x)\n", this->serial_number);
 	serial_num.insert(0, "\tserial number: ");
 	serial_num.append(hex_serial_num);
 	return serial_num;
@@ -46,8 +50,8 @@ std::string Certificate::get_end_date_with_format() {
 std::string Certificate::get_modulus_with_format() {
 	std::string mod = std::to_string(this->client_modulus);
 	mod.insert(0, "\t\tmodulus: ");
-	char hex_mod_num[11];
-	snprintf(hex_mod_num, 11, " (0x%04x)\n", this->client_modulus);
+	char hex_mod_num[HEX_SIZE_MOD];
+	snprintf(hex_mod_num, HEX_SIZE_MOD, " (0x%04x)\n", this->client_modulus);
 	mod.append(hex_mod_num);
 	return mod;
 }
@@ -55,8 +59,8 @@ std::string Certificate::get_modulus_with_format() {
 std::string Certificate::get_exponent_with_format() {
 	std::string exp = std::to_string(this->client_exponent);
 	exp.insert(0, "\t\texponent: ");
-	char hex_exp_num[8];
-	snprintf(hex_exp_num, 8, " (0x%02x)", this->client_exponent);
+	char hex_exp_num[HEX_SIZE_EXPON];
+	snprintf(hex_exp_num, HEX_SIZE_EXPON, " (0x%02x)", this->client_exponent);
 	exp.append(hex_exp_num);
 	return exp;
 }
@@ -114,17 +118,17 @@ Certificate::Certificate(std::string &file_name) {
 	std::getline(file, value_side);
 	this->serial_number = this->get_number(value_side);
 	std::getline(file, key_side, ':');
-	std::getline(file.ignore( 1, ' '), value_side);
+	std::getline(file.ignore(1, ' '), value_side);
 	this->subject = value_side;
-	std::getline(file, key_side); //ISSUER
-	std::getline(file, key_side); //VALIDITY
+	std::getline(file, key_side); 
+	std::getline(file, key_side); 
 
 	std::getline(file, key_side, ':');
-	std::getline(file.ignore( 1, ' '), value_side);
+	std::getline(file.ignore(1, ' '), value_side);
 	this->start_date = value_side;
 
 	std::getline(file, key_side, ':');
-	std::getline(file.ignore( 1, ' '), value_side);
+	std::getline(file.ignore(1, ' '), value_side);
 	this->end_date = value_side;
 
 	std::getline(file, key_side);

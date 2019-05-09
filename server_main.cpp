@@ -24,7 +24,6 @@
 
 
 int main(int argc, char* argv[]) {
-
 	if (argc != EXACT_ARGS) {
 		printf("ERROR EN LA CANTIDAD DE ARGS\n");
 		return 1;

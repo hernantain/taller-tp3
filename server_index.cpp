@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <map>
 
 #include "server_index.h"
 #include "common_key.h"
@@ -28,10 +29,11 @@ IndexHandler::IndexHandler(std::string &file_name) {
 }
 
 bool IndexHandler::has(std::string key) {
-	if (this->private_map.find(key) == this->private_map.end()) 
+	if (this->private_map.find(key) == this->private_map.end()) {
         return false;
-    else
+	} else {
     	return true; 
+	}
 }
 
 void IndexHandler::add(std::string user, Key &key) {
@@ -47,8 +49,16 @@ void IndexHandler::save() {
 	std::map<std::string, Key>::iterator itr; 
 	this->write_file.open(this->file_name);
 	this->write_file << std::to_string(this->current_index) << std::endl;
-	for (itr = this->private_map.begin(); itr != this->private_map.end(); itr++) 
-		this->write_file << itr->first << "; " << std::to_string(itr->second.get_exponent()) << " " << std::to_string(itr->second.get_modulus()) << std::endl;
+	for (itr = this->private_map.begin(); 
+			itr != this->private_map.end(); 
+			itr++) { 
+		this->write_file << 
+			itr->first << "; " << 
+			std::to_string(itr->second.get_exponent()) << 
+			" " << 
+			std::to_string(itr->second.get_modulus()) << 
+			std::endl;
+	}
 }
 
 Key IndexHandler::get_key(std::string user) {

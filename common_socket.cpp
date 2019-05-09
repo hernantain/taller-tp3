@@ -11,6 +11,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <string>
 #include "common_socket.h"
 
 #define BYTE_LEN 1
@@ -35,7 +36,9 @@ Socket::Socket(const char *hostname, const char *port, bool server) {
 
 	for (rp = results; rp != NULL; rp = rp->ai_next) {
 		if (server)
-			this->fd = socket(rp->ai_family, rp->ai_socktype | SOCK_NONBLOCK, rp->ai_protocol);
+			this->fd = socket(rp->ai_family, 
+							rp->ai_socktype | SOCK_NONBLOCK, 
+							rp->ai_protocol);
 		else 
 			this->fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
 
@@ -63,7 +66,6 @@ Socket::Socket(const char *hostname, const char *port, bool server) {
 
 			close(this->fd); 
 		}
-
 	}
 	freeaddrinfo(results);
 }
@@ -125,8 +127,8 @@ void Socket::operator<<(uint32_t num) {
 
 void Socket::operator<<(std::string message) {
 	uint32_t len = htonl(message.size());
-	this->send_message( (char*) &len, FOUR_BYTE_LEN);
-	this->send_message( (char*) message.c_str(), (int) message.length());	
+	this->send_message((char*) &len, FOUR_BYTE_LEN);
+	this->send_message((char*) message.c_str(), (int) message.length());	
 }
 
 void Socket::operator>>(uint8_t &buf) {

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <thread>
+#include <string>
 
 #include "common_socket.h"
 #include "server_index.h"
@@ -19,7 +20,7 @@ class Thread {
 		std::thread thread;
  
 	public:
-		Thread ();
+		Thread();
 
 		void start();
 		void join();
@@ -40,12 +41,10 @@ class Thread {
 
 
 class ClientThread: public Thread {
-
 	Socket connected_skt;
 	IndexHandler &index_handler;
 
 	public:
-	
 	ClientThread(Socket connected_skt, IndexHandler &index_handler);
 
 	virtual void stop();
@@ -56,7 +55,6 @@ class ClientThread: public Thread {
 
 
 class AcceptorThread: public Thread {
-
 	bool must_run;
 	const char *port, *server_keys;
 	std::string index;

@@ -5,17 +5,17 @@
 
 #include "common_key.h"
 
-std::vector<Key*> KeyFactory::Create(const char *file_name) {
-	std::vector<Key*> keys;
+std::vector<Key> KeyFactory::Create(const char *file_name) {
+	std::vector<Key> keys;
 	std::ifstream file;
 	file.open(file_name);
 	uint16_t public_exp, private_exp, mod;
 	file >> public_exp >> private_exp >> mod;
 	Key public_key((uint8_t) public_exp, mod);
-	keys.push_back(&public_key);
+	keys.push_back(public_key);
 	Key private_key((uint8_t) private_exp, mod);
-	keys.push_back(&private_key);
-	return keys;
+	keys.push_back(private_key);
+	return std::move(keys);
 }
 
 Key::Key(){}

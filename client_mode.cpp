@@ -1,19 +1,21 @@
 #include <iostream>
+#include <string>
 
 #include "common_socket.h"
 #include "common_key.h"
 #include "common_certificate.h"
 #include "common_encrypter.h"
 #include "client_info.h"
-
 #include "client_mode.h"
 
 
-ClientMode::ClientMode(Socket &skt, Key &public_client_key, Key &private_client_key, 
+ClientMode::ClientMode(Socket &skt, 
+					Key &public_client_key, 
+					Key &private_client_key, 
 					Key &server_pub_keys) : skt(skt),
-										public_client_key(public_client_key),
-										private_client_key(private_client_key),
-										server_pub_keys(server_pub_keys) {}
+									public_client_key(public_client_key),
+									private_client_key(private_client_key),
+									server_pub_keys(server_pub_keys) {}
 
 ClientNewMode::ClientNewMode(Socket &skt,
 				Key &public_client_key, 
@@ -110,8 +112,12 @@ void ClientRevokeMode::send() {
 	uint8_t revoke_status;
 	this->skt >> revoke_status;
 	
-	std::cout << "Hash calculado: " << encrypter.get_calculated_hash() << std::endl;
-	std::cout << "Hash encriptado con la clave privada: " << encrypter.get_hash_encrypted_with_private() << std::endl;
+	std::cout << "Hash calculado: " 
+			<< encrypter.get_calculated_hash() 
+			<< std::endl;
+	std::cout << "Hash encriptado con la clave privada: " 
+			<< encrypter.get_hash_encrypted_with_private() 
+			<< std::endl;
 	std::cout << "Huella enviada: " << encrypted_hash << std::endl;
 	if (revoke_status == 1) {
 		std::cout << "Error: usuario no registrado." << std::endl;

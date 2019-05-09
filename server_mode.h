@@ -16,7 +16,9 @@ class ServerMode {
 	Key private_server_key;
 	IndexHandler &index_handler;
 
-	ServerMode(Socket &skt, Key &private_server_key, IndexHandler &index_handler);
+	ServerMode(Socket &skt, 
+			Key &private_server_key, 
+			IndexHandler &index_handler);
 
 	virtual void receive() = 0;
 
@@ -29,16 +31,18 @@ class ServerNewMode: public ServerMode {
 	Key client_public_key;
 
 	public:
-
-	ServerNewMode(Socket &skt, Key &private_server_key, IndexHandler &index_handler);
+	ServerNewMode(Socket &skt, 
+				Key &private_server_key, 
+				IndexHandler &index_handler);
 
 	virtual void receive();
 };
 
 class ServerRevokeMode: public ServerMode {
 	public:
-
-	ServerRevokeMode(Socket &skt, Key &private_server_key, IndexHandler &index_handler);
+	ServerRevokeMode(Socket &skt, 
+					Key &private_server_key, 
+					IndexHandler &index_handler);
 
 	virtual void receive();
 };

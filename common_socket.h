@@ -1,6 +1,7 @@
 #ifndef _COMMON_SOCKET
 #define _COMMON_SOCKET
 
+#include <string>
 
 class Socket {
 	int fd; 
@@ -8,7 +9,6 @@ class Socket {
 	Socket(int fd, bool valid);
 
 	public:
-
 	bool is_valid;
 
 	Socket(const char *hostname, const char *port, bool server);

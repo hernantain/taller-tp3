@@ -31,7 +31,6 @@
 int main(int argc, char* argv[]) {
 	if (argc != CLIENT_ARGS) {
 		printf("Error: argumentos invalidos.\n");
-		printf("Uso:\n./client <ip> <port> new/revoke <claves clientes> <publica servidor> <informacion certificado>\n");
 		return 1;
 	}
 
@@ -43,9 +42,9 @@ int main(int argc, char* argv[]) {
 
 	Socket skt(host, port, false);
 	
-	std::vector<Key*> keys = KeyFactory::Create(client_keys);
-	Key public_client_key = *keys[0];
-	Key private_client_key = *keys[1];
+	std::vector<Key> keys = KeyFactory::Create(client_keys);
+	Key public_client_key = keys[0];
+	Key private_client_key = keys[1];
 			
 	Key server_pub_keys(pub_serv_keys);
 	
@@ -53,7 +52,11 @@ int main(int argc, char* argv[]) {
 		std::string req_info = argv[INFO_CERT];
 		skt << (uint8_t) NEW_COMMAND;
 		
-		ClientNewMode mode(skt, public_client_key, private_client_key, server_pub_keys, req_info);
+		ClientNewMode mode(skt, 
+						public_client_key, 
+						private_client_key, 
+						server_pub_keys, 
+						req_info);
 
 		mode.send();
 
@@ -62,12 +65,15 @@ int main(int argc, char* argv[]) {
 		skt << (uint8_t) REV_COMMAND;
 		std::string certificate_file = argv[INFO_CERT];
 
-		ClientRevokeMode mode(skt, public_client_key, private_client_key, server_pub_keys, certificate_file);
+		ClientRevokeMode mode(skt, 
+							public_client_key, 
+							private_client_key, 
+							server_pub_keys, 
+							certificate_file);
 
 		mode.send();
 	} else {
 		printf("Error: argumentos invalidos.\n"); 
-		printf("Uso:\n./client <ip> <port> new/revoke <claves clientes> <publica servidor> <informacion certificado>\n");
 		return 1;
 	}
 

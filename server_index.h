@@ -4,11 +4,11 @@
 #include <fstream>
 #include <map>
 #include <iostream>
+#include <string>
 
 #include "common_key.h"
 
 class IndexHandler {
-
 	int current_index;
 	std::string file_name;
 	std::ifstream read_file;
@@ -16,7 +16,7 @@ class IndexHandler {
 	std::map<std::string, Key> private_map;
 
 	public:
-	IndexHandler(std::string &file_name);
+	explicit IndexHandler(std::string &file_name);
 
 	bool has(std::string key);
 

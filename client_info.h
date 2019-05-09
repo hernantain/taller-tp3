@@ -4,14 +4,14 @@
 #include <cstdint>
 #include <fstream>
 #include <ctime>
-
+#include <string>
 
 class ClientInfo {
 	std::string name, start_date, end_date;
 	std::ifstream file;
 
 	public:
-	ClientInfo(std::string file_name);
+	explicit ClientInfo(std::string file_name);
 
 	std::string get_name();
 

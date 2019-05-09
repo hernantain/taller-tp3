@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <fstream>
+#include <string>
 
 #include "client_info.h"
 
