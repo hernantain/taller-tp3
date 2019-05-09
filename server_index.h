@@ -5,6 +5,7 @@
 #include <map>
 #include <iostream>
 #include <string>
+#include <mutex>
 
 #include "common_key.h"
 
@@ -14,6 +15,7 @@ class IndexHandler {
 	std::ifstream read_file;
 	std::ofstream write_file;
 	std::map<std::string, Key> private_map;
+	std::mutex m;
 
 	public:
 	explicit IndexHandler(std::string &file_name);

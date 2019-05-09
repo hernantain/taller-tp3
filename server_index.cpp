@@ -29,20 +29,28 @@ IndexHandler::IndexHandler(std::string &file_name) {
 }
 
 bool IndexHandler::has(std::string key) {
+	this->m.lock();
 	if (this->private_map.find(key) == this->private_map.end()) {
+		this->m.unlock();
         return false;
 	} else {
+		this->m.unlock();
     	return true; 
 	}
 }
 
 void IndexHandler::add(std::string user, Key &key) {
+	this->m.lock();
 	this->private_map[user] = key;
 	this->current_index++;
+	this->m.unlock();
 }
 
 int IndexHandler::get_next_index() {
-	return this->current_index;
+	this->m.lock();
+	int idx = this->current_index;
+	this->m.unlock();
+	return idx;
 }
 
 void IndexHandler::save() {
@@ -62,10 +70,14 @@ void IndexHandler::save() {
 }
 
 Key IndexHandler::get_key(std::string user) {
+	this->m.lock();
 	Key k = this->private_map.at(user);
+	this->m.unlock();
 	return std::move(k);
 }
 
 void IndexHandler::remove(std::string user) {
+	this->m.lock();
 	this->private_map.erase(user);
+	this->m.unlock();
 }
