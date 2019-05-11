@@ -77,11 +77,22 @@ void ServerMode::send() {
 }
 
 
+
 ServerRevokeMode::ServerRevokeMode(Socket &skt, 
 					Key &private_server_key, 
 					IndexHandler &index_handler) : ServerMode(skt, 
 									private_server_key, 
 									index_handler) {}
+
+void ServerNewMode::process() {
+	this->receive();
+	this->send();
+}
+
+
+void ServerRevokeMode::process() {
+	this->receive();
+}
 
 
 void ServerRevokeMode::receive() {

@@ -21,6 +21,7 @@ class ServerMode {
 			IndexHandler &index_handler);
 
 	virtual void receive() = 0;
+	virtual void process() = 0;
 
 	public:
 	void send();
@@ -36,6 +37,8 @@ class ServerNewMode: public ServerMode {
 				IndexHandler &index_handler);
 
 	virtual void receive();
+
+	virtual void process();
 };
 
 class ServerRevokeMode: public ServerMode {
@@ -45,6 +48,8 @@ class ServerRevokeMode: public ServerMode {
 					IndexHandler &index_handler);
 
 	virtual void receive();
+
+	virtual void process();
 };
 
 
