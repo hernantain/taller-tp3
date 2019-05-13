@@ -59,7 +59,6 @@ void ClientThread::run() {
 							private_server_key, 
 							this->index_handler);
 		mode.process();
-		//mode.receive();
 	}
 }
 

@@ -22,14 +22,16 @@ class ServerMode {
 
 	virtual void receive() = 0;
 	virtual void process() = 0;
-
-	public:
-	void send();
 };
 
 
 class ServerNewMode: public ServerMode {
 	Key client_public_key;
+	uint32_t calculated_print;
+
+	bool user_present();
+
+	void send();
 
 	public:
 	ServerNewMode(Socket &skt, 
@@ -42,6 +44,10 @@ class ServerNewMode: public ServerMode {
 };
 
 class ServerRevokeMode: public ServerMode {
+	uint32_t encrypted_hash;
+
+	void remove_user();
+
 	public:
 	ServerRevokeMode(Socket &skt, 
 					Key &private_server_key, 
