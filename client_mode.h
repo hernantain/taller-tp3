@@ -22,15 +22,19 @@ class ClientMode {
 			Key &server_pub_keys);
 
 	virtual void send() = 0;
-
-	public:
-	void receive();
+	virtual void process() = 0;
 };
 
 
 class ClientNewMode: public ClientMode {
+	Certificate certificate;
 	ClientInfo client_info;
+	std::string cert_string;
 
+	virtual void send();
+	bool user_present();
+	void receive();
+	
 	public:
 	ClientNewMode(Socket &skt, 
 			Key &public_client_key, 
@@ -38,12 +42,16 @@ class ClientNewMode: public ClientMode {
 			Key &server_pub_keys, 
 			std::string &client_req);
 
-	virtual void send();
+	virtual void process();
 };
 
 
 class ClientRevokeMode: public ClientMode {
 	Certificate certificate;
+	std::string cert;
+	
+	virtual void send();
+	void print_revoke_status();
 
 	public:
 	ClientRevokeMode(Socket &skt, 
@@ -52,7 +60,7 @@ class ClientRevokeMode: public ClientMode {
 				Key &server_pub_keys, 
 				std::string &certificate_file);
 
-	virtual void send();
+	virtual void process();
 };
 
 #endif

@@ -27,6 +27,13 @@ ClientNewMode::ClientNewMode(Socket &skt,
 								server_pub_keys), client_info(client_req) {}
 
 
+void ClientNewMode::process() {
+	this->send();
+	if (!this->user_present())
+		this->receive();
+}
+
+
 void ClientNewMode::send() {
 	this->skt << this->client_info.get_name();
 	this->skt << this->public_client_key.get_modulus();
@@ -35,49 +42,69 @@ void ClientNewMode::send() {
 	this->skt << this->client_info.get_end_date();
 }
 
-void ClientMode::receive() {
+bool ClientNewMode::user_present() {
 	uint8_t status;
 	skt >> status;
 	if (status == 0) {
 		std::cout << "Error: ya existe un certificado." << std::endl;
+		return true;
+	} else {
+		skt >> this->certificate.serial_number;
+		skt >> this->certificate.subject;
+		skt >> this->certificate.issuer;
+		skt >> this->certificate.start_date;
+		skt >> this->certificate.end_date;
+		skt >> this->certificate.client_modulus;
+		skt >> this->certificate.client_exponent;
+		this->cert_string = this->certificate();
+		return false;
+	}
+}
+
+
+void ClientNewMode::receive() {
+	Encrypter encrypter(this->cert_string, 
+					this->private_client_key, 
+					this->server_pub_keys);
+
+	uint32_t server_print;
+	skt >> server_print;
+	std::cout << "Huella del servidor: " << server_print << std::endl; 
+	
+	uint32_t server_hash = encrypter.decrypt(server_print);
+	std::cout << "Hash del servidor: " << server_hash << std::endl; 
+
+	encrypter.calculate_hash();
+	uint32_t calculated_hash = encrypter.get_calculated_hash();
+	std::cout << "Hash calculado: " << calculated_hash << std::endl;
+
+	uint8_t hash_status = (calculated_hash == server_hash) ? 0 : 1;
+	skt << hash_status;
+	if (hash_status == 0){
+		this->certificate.save();
 		exit(0);
 	} else {
-		Certificate certificate;
-		skt >> certificate.serial_number;
-		skt >> certificate.subject;
-		skt >> certificate.issuer;
-		skt >> certificate.start_date;
-		skt >> certificate.end_date;
-		skt >> certificate.client_modulus;
-		skt >> certificate.client_exponent;
-
-		//std::cout << certificate();
-		std::string cert_string = certificate();
-		Encrypter encrypter(cert_string, private_client_key, server_pub_keys);
-
-		uint32_t server_print;
-		skt >> server_print;
-		std::cout << "Huella del servidor: " << server_print << std::endl; 
-		
-		uint32_t server_hash = encrypter.decrypt(server_print);
-		std::cout << "Hash del servidor: " << server_hash << std::endl; 
-
-		encrypter.calculate_hash();
-		uint32_t calculated_hash = encrypter.get_calculated_hash();
-		std::cout << "Hash calculado: " << calculated_hash << std::endl;
-
-
-		uint8_t hash_status = (calculated_hash == server_hash) ? 0 : 1;
-		skt << hash_status;
-		if (hash_status == 0){
-			//std::cout << "SON IGUALES!!!" << std::endl;
-			certificate.save();
-			exit(0);
-		} else {
-			std::cout << "Error: los hashes no coinciden." << std::endl;
-			exit(0);
-		}
+		std::cout << "Error: los hashes no coinciden." << std::endl;
+		exit(0);
 	}
+}
+
+
+void ClientRevokeMode::process() {
+	this->send();
+	this->print_revoke_status();
+}
+
+
+void ClientRevokeMode::send() {
+	this->skt << this->certificate.serial_number;
+	this->skt << this->certificate.subject;
+	this->skt << this->certificate.issuer;
+	this->skt << this->certificate.start_date;
+	this->skt << this->certificate.end_date;
+	this->skt << this->certificate.client_modulus;
+	this->skt << this->certificate.client_exponent;
+	this->cert = this->certificate();
 }
 
 
@@ -92,18 +119,11 @@ ClientRevokeMode::ClientRevokeMode(Socket &skt,
 								certificate(certificate_file) {}
 
 
-void ClientRevokeMode::send() {
-	this->skt << this->certificate.serial_number;
-	this->skt << this->certificate.subject;
-	this->skt << this->certificate.issuer;
-	this->skt << this->certificate.start_date;
-	this->skt << this->certificate.end_date;
-	this->skt << this->certificate.client_modulus;
-	this->skt << this->certificate.client_exponent;
+void ClientRevokeMode::print_revoke_status() {
+	Encrypter encrypter(this->cert, 
+					this->private_client_key, 
+					this->server_pub_keys);
 
-	std::string cert = this->certificate();
-
-	Encrypter encrypter(cert, private_client_key, server_pub_keys);
 	encrypter.calculate_hash();
 	uint32_t encrypted_hash = encrypter.encrypt();
 

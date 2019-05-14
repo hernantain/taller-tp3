@@ -31,7 +31,7 @@
 int main(int argc, char* argv[]) {
 	if (argc != CLIENT_ARGS) {
 		printf("Error: argumentos invalidos.\n");
-		return 1;
+		return 0;
 	}
 
 	std::string mode = argv[MODE_ARG];
@@ -58,9 +58,9 @@ int main(int argc, char* argv[]) {
 						server_pub_keys, 
 						req_info);
 
-		mode.send();
-
-		mode.receive();
+		mode.process();
+		//mode.send();
+		//mode.receive();
 	} else if (mode == REV_MODE) {
 		skt << (uint8_t) REV_COMMAND;
 		std::string certificate_file = argv[INFO_CERT];
@@ -71,10 +71,11 @@ int main(int argc, char* argv[]) {
 							server_pub_keys, 
 							certificate_file);
 
-		mode.send();
+		mode.process();
+		//mode.send();
 	} else {
 		printf("Error: argumentos invalidos.\n"); 
-		return 1;
+		return 0;
 	}
 
 	return 0;

@@ -14,7 +14,6 @@
 #define VALIDATION_FAILED 2
 
 
-
 ServerMode::ServerMode(Socket &skt, 
 					Key &private_server_key, 
 					IndexHandler &index_handler) : skt(skt),

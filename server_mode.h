@@ -30,15 +30,14 @@ class ServerNewMode: public ServerMode {
 	uint32_t calculated_print;
 
 	bool user_present();
-
 	void send();
+	virtual void receive();
 
 	public:
 	ServerNewMode(Socket &skt, 
 				Key &private_server_key, 
 				IndexHandler &index_handler);
 
-	virtual void receive();
 
 	virtual void process();
 };
@@ -47,13 +46,13 @@ class ServerRevokeMode: public ServerMode {
 	uint32_t encrypted_hash;
 
 	void remove_user();
+	virtual void receive();
 
 	public:
 	ServerRevokeMode(Socket &skt, 
 					Key &private_server_key, 
 					IndexHandler &index_handler);
 
-	virtual void receive();
 
 	virtual void process();
 };

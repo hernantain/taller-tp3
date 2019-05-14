@@ -51,13 +51,13 @@ void ClientThread::run() {
 						private_server_key,
 						this->index_handler);
 		
+	
 		mode.process();
-		//mode.receive();
-		//mode.send();
 	} else if (command == REV_COMMAND) {
 		ServerRevokeMode mode(this->connected_skt, 
 							private_server_key, 
 							this->index_handler);
+	
 		mode.process();
 	}
 }
