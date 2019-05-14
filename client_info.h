@@ -6,6 +6,9 @@
 #include <ctime>
 #include <string>
 
+//Clase que encapsula la informacion del cliente
+//para el modo 'new'. Almacena nombre y las fechas
+//de validez del certificado.
 class ClientInfo {
 	std::string name, start_date, end_date;
 	std::ifstream file;

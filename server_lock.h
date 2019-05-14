@@ -3,6 +3,8 @@
 
 #include <mutex>
 
+//Clase Lock que maneja con RAII
+//los mutex que se usan en el IndexHandler
 class Lock {
 	private:
 		std::mutex &m;

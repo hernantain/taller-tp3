@@ -14,7 +14,9 @@
 #define NEW_COMMAND 0
 #define REV_COMMAND 1
 
-
+//Clase Thread: encapsulta el thread correspondiente y 
+//tiene los metodos start y join que llamaran y cerraran 
+//al thread que corresponda con el metodo que corresponda.
 class Thread {
 	private:
 		std::thread thread;
@@ -40,6 +42,8 @@ class Thread {
 };
 
 
+//Hilo que correra las comunicaciones correspondientes con el cliente.
+//Puede haber multiples hilos de este tipo corriendo a la vez
 class ClientThread: public Thread {
 	Socket connected_skt;
 	IndexHandler &index_handler;
@@ -56,7 +60,10 @@ class ClientThread: public Thread {
 };
 
 
-
+//Hilo que acepta conexiones y llama a ClientThread con la informacion
+//correspondiente.
+//Correra hasta que en otro hilo (main) se lea una 'q' de stdin y este 
+//llame al metodo stop, deteniendo asi el thread.
 class AcceptorThread: public Thread {
 	bool must_run;
 	const char *port, *server_keys;
@@ -73,9 +80,6 @@ class AcceptorThread: public Thread {
 
 	~AcceptorThread();
 };
-
-
-
 
 #endif
 

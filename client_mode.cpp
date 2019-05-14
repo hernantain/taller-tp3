@@ -30,7 +30,7 @@ ClientNewMode::ClientNewMode(Socket &skt,
 void ClientNewMode::process() {
 	this->send();
 	if (!this->user_present())
-		this->receive();
+		this->print_new_status();
 }
 
 
@@ -42,6 +42,18 @@ void ClientNewMode::send() {
 	this->skt << this->client_info.get_end_date();
 }
 
+void ClientNewMode::receive() {
+	skt >> this->certificate.serial_number;
+	skt >> this->certificate.subject;
+	skt >> this->certificate.issuer;
+	skt >> this->certificate.start_date;
+	skt >> this->certificate.end_date;
+	skt >> this->certificate.client_modulus;
+	skt >> this->certificate.client_exponent;
+	this->cert_string = this->certificate();
+}
+
+
 bool ClientNewMode::user_present() {
 	uint8_t status;
 	skt >> status;
@@ -49,20 +61,13 @@ bool ClientNewMode::user_present() {
 		std::cout << "Error: ya existe un certificado." << std::endl;
 		return true;
 	} else {
-		skt >> this->certificate.serial_number;
-		skt >> this->certificate.subject;
-		skt >> this->certificate.issuer;
-		skt >> this->certificate.start_date;
-		skt >> this->certificate.end_date;
-		skt >> this->certificate.client_modulus;
-		skt >> this->certificate.client_exponent;
-		this->cert_string = this->certificate();
+		this->receive();
 		return false;
 	}
 }
 
 
-void ClientNewMode::receive() {
+void ClientNewMode::print_new_status() {
 	Encrypter encrypter(this->cert_string, 
 					this->private_client_key, 
 					this->server_pub_keys);

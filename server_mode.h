@@ -9,6 +9,8 @@
 #include "server_index.h"
 
 
+//Clases Server segun el modo de ejecucion correspondiente. 
+//Logica muy similar a la descripta en el client_mode.h
 class ServerMode {
 	protected:
 	Certificate new_cert;
