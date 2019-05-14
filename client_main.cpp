@@ -45,7 +45,6 @@ int main(int argc, char* argv[]) {
 	std::vector<Key> keys = KeyFactory::Create(client_keys);
 	Key public_client_key = keys[0];
 	Key private_client_key = keys[1];
-			
 	Key server_pub_keys(pub_serv_keys);
 	
 	if (mode == NEW_MODE) {
@@ -59,8 +58,6 @@ int main(int argc, char* argv[]) {
 						req_info);
 
 		mode.process();
-		//mode.send();
-		//mode.receive();
 	} else if (mode == REV_MODE) {
 		skt << (uint8_t) REV_COMMAND;
 		std::string certificate_file = argv[INFO_CERT];
@@ -72,7 +69,6 @@ int main(int argc, char* argv[]) {
 							certificate_file);
 
 		mode.process();
-		//mode.send();
 	} else {
 		printf("Error: argumentos invalidos.\n"); 
 		return 0;

@@ -43,9 +43,12 @@ class Thread {
 class ClientThread: public Thread {
 	Socket connected_skt;
 	IndexHandler &index_handler;
+	Key &private_server_key;
 
 	public:
-	ClientThread(Socket connected_skt, IndexHandler &index_handler);
+	ClientThread(Socket connected_skt, 
+			IndexHandler &index_handler, 
+			Key &private_server_key);
 
 	virtual void stop();
 
@@ -59,6 +62,7 @@ class AcceptorThread: public Thread {
 	const char *port, *server_keys;
 	std::string index;
 	std::vector<Thread*> clients;
+	Key private_server_key;
 
 	public:
 	AcceptorThread(const char *port, const char *server_keys, std::string &index);
